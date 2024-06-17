@@ -49,39 +49,48 @@ set up, and you can right-click + select "Run" anywhere in the main.py file.
 
 ## API Endpoints
 
-### `POST /admin/sounds/` - Create a new sound
+### `POST /admin/sounds/` - Create a new sound (or multiple sounds)
 
 Request Body:
 
 ```json
 {
-  "title": "New song 2",
-  "bpm": 120,
-  "genres": ["pop"],
-  "duration_in_seconds": 130,
-  "credits": [
-    {
-      "name": "King Sis",
-      "role": "VOCALIST"
-    },
-    {
-      "name": "Ooyy",
-      "role": "PRODUCER"
-    }
-  ]
+    "data": [
+        {
+        "title": "New song 2",
+        "bpm": 120,
+        "genres": ["pop"],
+        "duration_in_seconds": 130,
+        "credits": [
+            {
+                "name": "King Sis",
+                "role": "VOCALIST"
+            },
+            {
+                "name": "Ooyy",
+                "role": "PRODUCER"
+            }
+        ]
+        }
+    ]
 }
 ```
 
 ### `GET /sounds` - Get a list of existing sounds
 
-### `POST /playlists/` - Create a new playlist
+### `POST /playlists/` - Create a new playlist (or multiple playlists)
 
 Request Body:
 
 ```json
 {
-  "title": "New playlist",
-  "sounds": ["uuid-of-sound1", "uuid-of-sound2"]
+    "data":
+    [
+        {
+            "title": "New playlist",
+            "sounds": ["1d007db5-743c-48e8-a6e7-35c276b69c8c"]
+        }
+    ]
 }
 ```
 

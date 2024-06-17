@@ -33,11 +33,19 @@ class SoundCreate(SoundBase):
     pass
 
 
+class ManySoundCreate(BaseModel):
+    data: List[SoundCreate]
+
+
 class Sound(SoundBase):
     id: uuid.UUID
 
     class Config:
         from_attributes = True
+
+
+class ManySoundResponse(BaseModel):
+    data: List[Sound]
 
 
 class PlaylistBase(BaseModel):
@@ -54,3 +62,11 @@ class Playlist(PlaylistBase):
 
     class Config:
         from_attributes = True
+
+
+class ManyPlaylistCreate(BaseModel):
+    data: List[PlaylistCreate]
+
+
+class ManyPlaylistResponse(BaseModel):
+    data: List[Playlist]

@@ -1,9 +1,8 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import schemas, crud
 from app.database import SessionLocal
+from app.schemas import ManyPlaylistResponse, ManyPlaylistCreate
 
 router = APIRouter()
 
@@ -16,24 +15,23 @@ def get_db():
         db.close()
 
 
-@router.post("/playlists/", response_model=List[schemas.Playlist])
-def create_playlist(request_body: dict, db: Session = Depends(get_db)):
-    playlists_data = request_body.get("data")
-    if not isinstance(playlists_data, list):
+@router.post("/playlists/", response_model=ManyPlaylistResponse)
+def create_playlist(batch_playlist_create: ManyPlaylistCreate, db: Session =Depends(get_db)):
+    if not isinstance(batch_playlist_create.data, list):
         raise HTTPException(status_code=422,
                             detail="Invalid input: 'data' should be a list")
 
-    created_playlists = []
-    for playlist_data in playlists_data:
-        playlist = schemas.PlaylistCreate(title=playlist_data.get("title"),
-                                          sounds=playlist_data.get("sounds"))
-        db_playlist = crud.create_playlist(db=db, playlist=playlist)
+    playlist_responses = []
+    for playlist_create in batch_playlist_create.data:
+        playlist = schemas.PlaylistCreate(title=playlist_create.title,
+                                          sounds=playlist_create.sounds)
+        created_playlist = crud.create_playlist(db=db, playlist=playlist)
 
         playlist_response = schemas.Playlist(
-            id=db_playlist.id,
-            title=db_playlist.title,
-            sounds=[sound.id for sound in db_playlist.sounds]
+            id=created_playlist.id,
+            title=created_playlist.title,
+            sounds=[sound.id for sound in created_playlist.sounds]
         )
-        created_playlists.append(playlist_response)
+        playlist_responses.append(playlist_response)
 
-    return created_playlists
+    return {"data": playlist_responses}
