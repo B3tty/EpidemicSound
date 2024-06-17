@@ -24,7 +24,7 @@ not necessary for this project.
     ```
 5. Run the application:
     ```bash
-    uvicorn app.main:app --reload
+    uvicorn app.main:app --reload --port 8080
     ```
 Note: You can also run this application in PyCharm. Ensure that you have a Python interpreter 
 set up, and you can right-click + select "Run" anywhere in the main.py file.
@@ -134,3 +134,7 @@ Improve error handling and validation to provide more informative error messages
 
 ### Deployment
 Deploy the application using a cloud service provider like AWS, GCP, or Azure and use a managed database service.
+
+### Environment management
+Here `host` and `port` are set as convenient for a local usage. In production, we would set these 
+from environment variables. 
