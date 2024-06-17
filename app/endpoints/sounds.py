@@ -1,9 +1,7 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import schemas, crud
+from app import crud
 from app.database import SessionLocal
 from app.schemas import ManySoundResponse, ManySoundRecommendation
 

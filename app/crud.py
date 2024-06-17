@@ -3,7 +3,6 @@ import uuid
 from collections import Counter
 from typing import List
 
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models
