@@ -15,7 +15,7 @@ def get_db():
         db.close()
 
 
-@router.post("/playlists/", response_model=ManyPlaylistResponse)
+@router.post("/playlists/", response_model=ManyPlaylistResponse, status_code=201)
 def create_playlist(batch_playlist_create: ManyPlaylistCreate, db: Session =Depends(get_db)):
     if not isinstance(batch_playlist_create.data, list):
         raise HTTPException(status_code=422,

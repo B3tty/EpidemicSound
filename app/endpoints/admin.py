@@ -16,16 +16,14 @@ def get_db():
         db.close()
 
 
-@router.post("/sounds/", response_model=ManySoundResponse)
+@router.post("/sounds/", response_model=ManySoundResponse, status_code=201)
 def create_sound(batch_sound_create: ManySoundCreate, db: Session = Depends(get_db)):
     if not isinstance(batch_sound_create.data, list):
         raise HTTPException(status_code=422,
                             detail="Invalid input: 'data' should be a list")
 
-    created_sounds = []
-    for sound_create in batch_sound_create.data:
-        created_sound = crud.create_sound(db=db, sound=sound_create)
+    created_db_sounds = crud.create_sounds(db=db, sounds=batch_sound_create.data)
+    for created_sound in created_db_sounds:
         created_sound.genres = created_sound.genres_list
-        created_sounds.append(created_sound)
 
-    return {"data": created_sounds}
+    return {"data": created_db_sounds}

@@ -17,7 +17,7 @@ class Credit(CreditBase):
     id: uuid.UUID
     sound_id: uuid.UUID
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -40,7 +40,7 @@ class ManySoundCreate(BaseModel):
 class Sound(SoundBase):
     id: uuid.UUID
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -60,7 +60,7 @@ class PlaylistCreate(PlaylistBase):
 class Playlist(PlaylistBase):
     id: uuid.UUID
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 

@@ -1,34 +1,39 @@
 import random
 import uuid
+from typing import List
 
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.schemas import SoundCreate
 
 
-def create_sound(db: Session, sound: schemas.SoundCreate):
-    db_sound = models.Sound(
-        id=str(uuid.uuid4()).replace("-", ""),
-        title=sound.title,
-        bpm=sound.bpm,
-        genres=",".join(sound.genres),
-        duration_in_seconds=sound.duration_in_seconds
-    )
-    db.add(db_sound)
-    db.commit()
-    db.refresh(db_sound)
-
-    for credit in sound.credits:
-        db_credit = models.Credit(
+def create_sounds(db: Session, sounds: List[SoundCreate]):
+    created_db_sounds = []
+    for sound in sounds:
+        db_sound = models.Sound(
             id=str(uuid.uuid4()).replace("-", ""),
-            name=credit.name,
-            role=credit.role,
-            sound_id=db_sound.id
+            title=sound.title,
+            bpm=sound.bpm,
+            genres=",".join(sound.genres),
+            duration_in_seconds=sound.duration_in_seconds
         )
-        db.add(db_credit)
+        db.add(db_sound)
+        db.commit()
+        db.refresh(db_sound)
+
+        for credit in sound.credits:
+            db_credit = models.Credit(
+                id=str(uuid.uuid4()).replace("-", ""),
+                name=credit.name,
+                role=credit.role,
+                sound_id=db_sound.id
+            )
+            db.add(db_credit)
+        created_db_sounds.append(db_sound)
 
     db.commit()
-    return db_sound
+    return created_db_sounds
 
 
 def get_sounds(db: Session):
