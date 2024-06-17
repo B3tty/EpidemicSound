@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 from pydantic import BaseModel
@@ -13,8 +14,8 @@ class CreditCreate(CreditBase):
 
 
 class Credit(CreditBase):
-    id: int
-    sound_id: int
+    id: uuid.UUID
+    sound_id: uuid.UUID
 
     class Config:
         from_attributes = True
@@ -33,7 +34,7 @@ class SoundCreate(SoundBase):
 
 
 class Sound(SoundBase):
-    id: int
+    id: uuid.UUID
 
     class Config:
         from_attributes = True
@@ -41,7 +42,7 @@ class Sound(SoundBase):
 
 class PlaylistBase(BaseModel):
     title: str
-    sounds: List[int]
+    sounds: List[uuid.UUID]
 
 
 class PlaylistCreate(PlaylistBase):
@@ -49,7 +50,7 @@ class PlaylistCreate(PlaylistBase):
 
 
 class Playlist(PlaylistBase):
-    id: int
+    id: uuid.UUID
 
     class Config:
         from_attributes = True
