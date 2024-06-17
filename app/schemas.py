@@ -70,3 +70,11 @@ class ManyPlaylistCreate(BaseModel):
 
 class ManyPlaylistResponse(BaseModel):
     data: List[Playlist]
+
+
+class SoundRecommendation(Sound):
+    pass
+
+
+class ManySoundRecommendation(BaseModel):
+    data: List[SoundRecommendation]

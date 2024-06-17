@@ -94,7 +94,10 @@ Request Body:
 }
 ```
 
-### `GET /sounds/recommended?playlistId={playListId}` - Get a recommended sound
+### `GET /sounds/recommended?playlistId={playListId}&limit={limit|5}` - Get a recommended sound
+
+This will look at the top 3 genres represented in this playlist, and recommend up to 5 (or a 
+specified limit) random sounds of the relevant genres.
 
 ## Choices Made
 - FastAPI Framework: Chosen for its modern, fast, and efficient capabilities in building APIs.

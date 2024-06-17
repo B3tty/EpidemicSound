@@ -1,11 +1,14 @@
 import random
 import uuid
+from collections import Counter
 from typing import List
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app import models, schemas
-from app.schemas import SoundCreate
+from app import models
+from app.models import Sound
+from app.schemas import SoundCreate, PlaylistCreate
 
 
 def create_sounds(db: Session, sounds: List[SoundCreate]):
@@ -43,7 +46,7 @@ def get_sounds(db: Session):
     return sounds
 
 
-def create_playlist(db: Session, playlist: schemas.PlaylistCreate):
+def create_playlist(db: Session, playlist: PlaylistCreate):
     db_playlist = models.Playlist(id=str(uuid.uuid4()).replace("-", ""),
                                   title=playlist.title)
     db.add(db_playlist)
@@ -68,3 +71,36 @@ def get_random_sound(db: Session):
         sound.genres = sound.genres_list
         return sound
     return None
+
+
+def get_recommendations_by_playlist(db: Session, playlist_id: str,
+    limit: int = 5):
+    playlist = db.query(models.Playlist).filter(models.Playlist.id ==
+                                                playlist_id.replace("-",
+                                                                    "")).first()
+    if not playlist:
+        raise Exception(f"Playlist {playlist_id} not found")
+
+    playlist_genres = []
+    for sound in playlist.sounds:
+        if sound.genres_list:
+            playlist_genres.extend(sound.genres_list)
+    if not playlist_genres:
+        return []
+
+    top_genres = [genre for genre, _ in Counter(playlist_genres).most_common(3)]
+    filtered_sounds = list(filter(lambda s:
+                                  has_genre_in_list(s, top_genres),
+                                  get_sounds(db)))
+
+    recommended_sounds = random.sample(filtered_sounds,
+                                       min(limit, len(filtered_sounds)))
+
+    return recommended_sounds
+
+
+def has_genre_in_list(sound: Sound, genres: [str]):
+    for genre in sound.genres:
+        if genre in genres:
+            return True
+    return False

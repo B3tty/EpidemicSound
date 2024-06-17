@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import schemas, crud
 from app.database import SessionLocal
-from app.schemas import ManySoundResponse
+from app.schemas import ManySoundResponse, ManySoundRecommendation
 
 router = APIRouter()
 
@@ -26,9 +26,16 @@ def get_sounds(db: Session = Depends(get_db)):
     return {"data": sounds}
 
 
-@router.get("/sounds/recommended", response_model=ManySoundResponse)
-def get_recommended_sound(db: Session = Depends(get_db)):
-    sound = crud.get_random_sound(db=db)
-    if not sound:
+@router.get("/sounds/recommended",
+            response_model=ManySoundRecommendation)
+def get_recommended_sound(playlistId: str, limit: int = 5, db: Session = (
+    Depends(get_db))):
+    try:
+        sounds = crud.get_recommendations_by_playlist(db=db,
+                                                      playlist_id=playlistId,
+                                                      limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e.__str__())
+    if len(sounds) == 0:
         raise HTTPException(status_code=404, detail="No sounds available")
-    return {"data": [sound]}
+    return {"data": sounds}
