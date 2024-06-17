@@ -73,6 +73,7 @@ def test_get_recommended_sounds_no_match():
 def test_get_recommended_sounds_existing_playlist():
     created_sound = insert_sound()
     created_playlist = insert_playlist(created_sound["id"])
+    insert_sound()
     response = client.get(f"/sounds/recommended?playlistId="
                           f"{created_playlist["id"]}")
     assert response.status_code == 200

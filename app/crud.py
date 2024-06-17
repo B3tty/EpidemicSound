@@ -90,7 +90,8 @@ def get_recommendations_by_playlist(db: Session, playlist_id: str,
 
     top_genres = [genre for genre, _ in Counter(playlist_genres).most_common(3)]
     filtered_sounds = list(filter(lambda s:
-                                  has_genre_in_list(s, top_genres),
+                                  (has_genre_in_list(s, top_genres) &
+                                   (s not in playlist.sounds)),
                                   get_sounds(db)))
 
     recommended_sounds = random.sample(filtered_sounds,
