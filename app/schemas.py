@@ -78,3 +78,18 @@ class SoundRecommendation(Sound):
 
 class ManySoundRecommendation(BaseModel):
     data: List[SoundRecommendation]
+
+
+class SoundStatisticsBase(BaseModel):
+    total_sounds: int
+    avg_bpm: float
+    top_genres: List[str]
+    avg_duration_in_seconds: float
+
+
+class GlobalSoundStatistics(SoundStatisticsBase):
+    total_playlists: int
+
+
+class PlaylistSoundStatistics(SoundStatisticsBase):
+    total_duration_in_seconds: int

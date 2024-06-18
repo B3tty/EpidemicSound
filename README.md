@@ -99,6 +99,14 @@ Request Body:
 This will look at the top 3 genres represented in this playlist, and recommend up to 5 (or a 
 specified limit) random sounds of the relevant genres.
 
+### `GET /sounds/statistics/global` - Get statistics on the sounds in the database
+
+This will give global statistics on the sounds in the database.
+
+### `GET /sounds/statistics?playlistId={playListId}` - Get statistics on the sounds in the specified playlist
+
+This will give global statistics on the sounds in the specified playlist.
+
 ## Choices Made
 - FastAPI Framework: Chosen for its modern, fast, and efficient capabilities in building APIs.
 - SQLAlchemy: Used for ORM to manage database interactions.

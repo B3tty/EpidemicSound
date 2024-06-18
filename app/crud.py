@@ -1,12 +1,14 @@
 import random
 import uuid
 from collections import Counter
+from statistics import mean
 from typing import List
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models
-from app.models import Sound
+from app.models import Sound, Playlist
 from app.schemas import SoundCreate, PlaylistCreate
 
 
@@ -78,16 +80,9 @@ def get_recommendations_by_playlist(db: Session, playlist_id: str,
                                                 playlist_id.replace("-",
                                                                     "")).first()
     if not playlist:
-        raise Exception(f"Playlist {playlist_id} not found")
+        raise LookupError(f"Playlist {playlist_id} not found")
 
-    playlist_genres = []
-    for sound in playlist.sounds:
-        if sound.genres_list:
-            playlist_genres.extend(sound.genres_list)
-    if not playlist_genres:
-        return []
-
-    top_genres = [genre for genre, _ in Counter(playlist_genres).most_common(3)]
+    top_genres = get_top_playlist_genres(playlist)
     filtered_sounds = list(filter(lambda s:
                                   (has_genre_in_list(s, top_genres) &
                                    (s not in playlist.sounds)),
@@ -104,3 +99,52 @@ def has_genre_in_list(sound: Sound, genres: [str]):
         if genre in genres:
             return True
     return False
+
+
+def get_global_statistics(db: Session):
+    genre_counts = db.query(Sound.genres, func.count(Sound.genres)).group_by(
+        Sound.genres).order_by(func.count(Sound.genres).desc()).all()
+    top_genres = [genre for genre, count in genre_counts][:3]
+    average_bpm = db.query(func.avg(Sound.bpm)).scalar()
+    average_duration = db.query(func.avg(Sound.duration_in_seconds)).scalar()
+    total_sounds = db.query(func.count(Sound.id)).scalar()
+    total_playlists = db.query(func.count(models.Playlist.id)).scalar()
+    return {
+        "total_sounds": total_sounds,
+        "avg_bpm": average_bpm,
+        "top_genres": top_genres,
+        "avg_duration_in_seconds": average_duration,
+        "total_playlists": total_playlists
+    }
+
+
+def get_statistics_for_playlist(db: Session, playlist_id: str):
+    playlist = db.query(models.Playlist).filter(models.Playlist.id ==
+                                                playlist_id.replace("-",
+                                                                    "")).first()
+    if not playlist:
+        raise LookupError(f"Playlist {playlist_id} not found")
+    sounds = playlist.sounds if playlist.sounds else []
+
+    return {
+        "total_sounds": len(sounds),
+        "avg_bpm": int(sum(sound.bpm for sound in sounds) / len(sounds)),
+        "top_genres": get_top_playlist_genres(playlist),
+        "avg_duration_in_seconds": int(sum(sound.duration_in_seconds for sound in sounds) /
+                                       len(sounds)),
+        "total_duration_in_seconds": sum(sound.duration_in_seconds for sound
+                                         in sounds)
+    }
+
+
+def get_top_playlist_genres(playlist: Playlist, top=3):
+    playlist_genres = []
+    for sound in playlist.sounds:
+        if sound.genres_list:
+            playlist_genres.extend(sound.genres_list)
+    if not playlist_genres:
+        return []
+
+    return [genre for genre, _ in Counter(playlist_genres).most_common(
+        top)]
+
