@@ -86,3 +86,48 @@ def test_get_recommended_sounds_existing_playlist():
         assert "genres" in sound
         assert "duration_in_seconds" in sound
         assert "credits" in sound
+
+
+def test_get_stats_non_existing_playlist():
+    response = client.get(f"/sounds/statistics?playlistId={random_uuid}")
+    assert response.status_code == 404
+    assert response.text.__contains__(f"Playlist {random_uuid} not found")
+
+
+def test_get_stats_existing_playlist():
+    created_sound = insert_sound()
+    created_playlist = insert_playlist(created_sound["id"])
+    response = client.get(f"/sounds/statistics?playlistId="
+                          f"{created_playlist["id"]}")
+    assert response.status_code == 200
+    stats = response.json()
+
+    assert "total_sounds" in stats
+    assert "avg_bpm" in stats
+    assert "top_genres" in stats
+    assert "avg_duration_in_seconds" in stats
+    assert "total_duration_in_seconds" in stats
+
+
+def test_get_stats_empty_playlist():
+    created_playlist = insert_playlist(random_uuid)
+    response = client.get(f"/sounds/statistics?playlistId="
+                          f"{created_playlist["id"]}")
+    assert response.status_code == 200
+    stats = response.json()
+
+    assert "total_sounds" in stats
+    assert stats["total_sounds"] == 0
+
+
+def test_get_global_stats():
+    insert_sound()
+    response = client.get(f"/sounds/statistics/global")
+    assert response.status_code == 200
+    stats = response.json()
+
+    assert "total_sounds" in stats
+    assert "avg_bpm" in stats
+    assert "top_genres" in stats
+    assert "avg_duration_in_seconds" in stats
+    assert "total_playlists" in stats

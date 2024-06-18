@@ -46,6 +46,29 @@ Session):
     assert playlist["title"] == "New playlist"
 
 
+def test_create_playlist_empty_playlist(client: TestClient, test_db:
+Session):
+    playlist_data = {
+        "data":
+            [
+                {
+                    "title": "New playlist",
+                    "sounds": []
+                }
+            ]
+    }
+
+    response = client.post("/playlists", json=playlist_data)
+    assert response.status_code == 201
+
+    created_playlists = response.json()["data"]
+    assert isinstance(created_playlists, list)
+    assert len(created_playlists) == 1
+
+    playlist = created_playlists[0]
+    assert playlist["title"] == "New playlist"
+
+
 def test_create_playlist_multiple_valid_playlists(client: TestClient, test_db:
 Session):
     playlist_data = {

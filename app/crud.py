@@ -124,14 +124,24 @@ def get_statistics_for_playlist(db: Session, playlist_id: str):
                                                                     "")).first()
     if not playlist:
         raise LookupError(f"Playlist {playlist_id} not found")
-    sounds = playlist.sounds if playlist.sounds else []
 
+    sounds = playlist.sounds
+    if not sounds:
+        return {
+            "total_sounds": 0,
+            "avg_bpm": 0,
+            "top_genres": [],
+            "avg_duration_in_seconds": 0,
+            "total_duration_in_seconds": 0
+        }
+
+    nb_sounds = len(playlist.sounds)
     return {
-        "total_sounds": len(sounds),
-        "avg_bpm": int(sum(sound.bpm for sound in sounds) / len(sounds)),
+        "total_sounds": nb_sounds,
+        "avg_bpm": int(sum(sound.bpm for sound in sounds) / nb_sounds),
         "top_genres": get_top_playlist_genres(playlist),
         "avg_duration_in_seconds": int(sum(sound.duration_in_seconds for sound in sounds) /
-                                       len(sounds)),
+                                       nb_sounds),
         "total_duration_in_seconds": sum(sound.duration_in_seconds for sound
                                          in sounds)
     }
