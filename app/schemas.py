@@ -91,5 +91,15 @@ class GlobalSoundStatistics(SoundStatisticsBase):
     total_playlists: int
 
 
+class GlobalStatisticsResponse(BaseModel):
+    data: GlobalSoundStatistics
+
+
 class PlaylistSoundStatistics(SoundStatisticsBase):
     total_duration_in_seconds: int
+
+
+class PlaylistStatisticsResponse(BaseModel):
+    data: PlaylistSoundStatistics
+
+

@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.database import SessionLocal
-from app.schemas import ManySoundResponse, ManySoundRecommendation, \
-    GlobalSoundStatistics, PlaylistSoundStatistics
+from app.schemas import (ManySoundResponse, ManySoundRecommendation,
+                         GlobalStatisticsResponse, PlaylistStatisticsResponse)
 
 router = APIRouter()
 
@@ -41,15 +41,15 @@ def get_recommended_sound(playlistId: str, limit: int = 5, db: Session = (
 
 
 @router.get("/sounds/statistics/global",
-            response_model=GlobalSoundStatistics)
+            response_model=GlobalStatisticsResponse)
 def get_recommended_sound(db: Session = (
     Depends(get_db))):
     stats = crud.get_global_statistics(db=db)
-    return stats
+    return {"data": stats}
 
 
 @router.get("/sounds/statistics",
-            response_model=PlaylistSoundStatistics)
+            response_model=PlaylistStatisticsResponse)
 def get_recommended_sound(playlistId: str, db: Session = (
     Depends(get_db))):
     try:
@@ -57,4 +57,4 @@ def get_recommended_sound(playlistId: str, db: Session = (
                                                  playlist_id=playlistId)
     except LookupError as e:
         raise HTTPException(status_code=404, detail=e.__str__())
-    return stats
+    return {"data": stats}

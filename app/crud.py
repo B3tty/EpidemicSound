@@ -102,13 +102,22 @@ def has_genre_in_list(sound: Sound, genres: [str]):
 
 
 def get_global_statistics(db: Session):
+    total_sounds = db.query(func.count(Sound.id)).scalar()
+    total_playlists = db.query(func.count(models.Playlist.id)).scalar()
+    if total_sounds==0:
+        return {
+            "total_sounds": 0,
+            "avg_bpm": 0,
+            "top_genres": [],
+            "avg_duration_in_seconds": 0,
+            "total_playlists": total_playlists
+        }
+
     genre_counts = db.query(Sound.genres, func.count(Sound.genres)).group_by(
         Sound.genres).order_by(func.count(Sound.genres).desc()).all()
     top_genres = [genre for genre, count in genre_counts][:3]
     average_bpm = db.query(func.avg(Sound.bpm)).scalar()
     average_duration = db.query(func.avg(Sound.duration_in_seconds)).scalar()
-    total_sounds = db.query(func.count(Sound.id)).scalar()
-    total_playlists = db.query(func.count(models.Playlist.id)).scalar()
     return {
         "total_sounds": total_sounds,
         "avg_bpm": average_bpm,

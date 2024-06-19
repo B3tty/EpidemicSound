@@ -100,7 +100,7 @@ def test_get_stats_existing_playlist():
     response = client.get(f"/sounds/statistics?playlistId="
                           f"{created_playlist["id"]}")
     assert response.status_code == 200
-    stats = response.json()
+    stats = response.json()["data"]
 
     assert "total_sounds" in stats
     assert "avg_bpm" in stats
@@ -114,7 +114,7 @@ def test_get_stats_empty_playlist():
     response = client.get(f"/sounds/statistics?playlistId="
                           f"{created_playlist["id"]}")
     assert response.status_code == 200
-    stats = response.json()
+    stats = response.json()["data"]
 
     assert "total_sounds" in stats
     assert stats["total_sounds"] == 0
@@ -124,7 +124,7 @@ def test_get_global_stats():
     insert_sound()
     response = client.get(f"/sounds/statistics/global")
     assert response.status_code == 200
-    stats = response.json()
+    stats = response.json()["data"]
 
     assert "total_sounds" in stats
     assert "avg_bpm" in stats
